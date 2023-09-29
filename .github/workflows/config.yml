@@ -15,8 +15,8 @@ on:
       - master
 
 jobs:
-  create-version-file:
-    if: github.event_name == 'pull_request'
+  create-release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -26,31 +26,11 @@ jobs:
       - name: Determine next version
         id: getVersion
         uses: Luke-Rogerson/pr-bump-version@v1
-      - name: Write version to file
-        run: |
-          echo "Outputted version is ${{ steps.getVersion.outputs.version }}"
-          echo ${{ steps.getVersion.outputs.version }} > .version
-      - name: Upload .version file as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: version
-          path: .version
-
-  create-release:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download .version file
-        uses: actions/download-artifact@v3
-        with:
-          name: version
-          path: ./
-
       - name: Create Github Release
         uses: ncipollo/release-action@v1.13.0
         with:
           artifacts: version
-          tag: $(cat .version)
+          tag: ${{ steps.getVersion.outputs.version }}"
           replacesArtifacts: false
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true
