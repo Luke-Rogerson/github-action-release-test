@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
       - name: Determine next version
         id: getVersion
-        uses: Luke-Rogerson/pr-bump-version@v1
+        uses: Luke-Rogerson/pr-bump-version@v1.1.0
       - name: Create Github Release
         uses: ncipollo/release-action@v1.13.0
         with:
